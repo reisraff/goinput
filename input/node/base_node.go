@@ -2,7 +2,7 @@ package node
 
 import "fmt"
 import "reflect"
-import "github.com/reisraff/go-input/input/interfaces"
+import "github.com/reisraff/goinput/input/interfaces"
 
 type NodeFactory func() interfaces.NodeInterface
 

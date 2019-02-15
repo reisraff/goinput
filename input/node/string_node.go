@@ -1,7 +1,7 @@
 package node
 
-import "github.com/reisraff/go-input/input/interfaces"
-import "github.com/reisraff/go-input/input/constraints"
+import "github.com/reisraff/goinput/input/interfaces"
+import "github.com/reisraff/goinput/input/constraints"
 
 func CreateStringNode() interfaces.NodeInterface {
     node := StringNode{}

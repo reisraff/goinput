@@ -1,3 +1,3 @@
-package go-input
+package goinput
 
 // required for vendoring
