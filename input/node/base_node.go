@@ -18,9 +18,11 @@ type BaseNode struct {
     children map[string]interfaces.NodeInterface
     constraints []interfaces.ConstraintInterface
     required bool
+    defaultValue interface{}
+    allowNull bool
 }
 
-func (self * BaseNode) SetRequired(required bool) {
+func (self *BaseNode) SetRequired(required bool) {
     self.required = required
 }
 
@@ -28,12 +30,40 @@ func (self BaseNode) IsRequired() bool {
     return self.required
 }
 
-func (self * BaseNode) SetTypeHandler(typeHandler interfaces.TypeHandlerInterface) {
+func (self *BaseNode) SetTypeHandler(typeHandler interfaces.TypeHandlerInterface) {
     self.typeHandler = typeHandler
 }
 
-func (self * BaseNode) Add(key string, _type string, options map[string]interface{}) (interfaces.NodeInterface, error) {
+func (self *BaseNode) Add(key string, _type string, options map[string]interface{}) (interfaces.NodeInterface, error) {
     child, err := self.typeHandler.GetType(_type)
+
+    if options == nil {
+        options = make(map[string]interface{})
+    }
+
+    if value, ok := options["required"]; ok {
+        child.SetRequired(value.(bool))
+    }
+
+    if value, ok := options["default_value"]; ok {
+        child.SetDefaultValue(value)
+    }
+
+    // if value, ok := options["instantiator"]; ok {
+    //     child.SetInstantiator(value)
+    // }
+
+    // if value, ok := options["transformer"]; ok {
+    //     child.SetTransformer(value)
+    // }
+
+    if value, ok := options["constraints"]; ok {
+        child.AddConstraints(value.([]interfaces.ConstraintInterface))
+    }
+
+    if value, ok := options["allow_null"]; ok {
+        child.SetAllowNull(value.(bool))
+    }
 
     if self.children == nil {
         self.children = map[string]interfaces.NodeInterface{}
@@ -43,13 +73,12 @@ func (self * BaseNode) Add(key string, _type string, options map[string]interfac
     return child, err
 }
 
-func (self * BaseNode) GetValue(field string, value interface{}) interface{} {
-    // if self.AllowNull() && value == nil {
-    //     return value
-    // }
+func (self *BaseNode) GetValue(field string, value interface{}) interface{} {
+    if self.AllowNull() && value == nil {
+        return value
+    }
 
-    _errors := self.CheckConstraints(field, value)
-    for _, err := range _errors {
+    for _, err := range self.CheckConstraints(field, value) {
         self.typeHandler.AddError(err)
     }
 
@@ -78,14 +107,13 @@ func (self BaseNode) Walk(input interface{}, parentField string) interface{} {
                     self.typeHandler.AddError(fmt.Sprintf("field '%s' is required", field))
                 }
 
-                // if ! node.hasDefault() {
-                //     continue
-                // }
+                if ! node.HasDefaultValue() {
+                    continue
+                }
 
-                // input.(map[string]interface{})[field] = node.getDefault()
+                input.(map[string]interface{})[field] = node.GetDefaultValue()
             }
 
-            fmt.Printf("input[%s] = %v\n", field, input.(map[string]interface{})[field])
             result[field] = node.GetValue(field, node.Walk(input.(map[string]interface{})[field], field))
         } else {
             self.typeHandler.AddError(fmt.Sprintf("value %v for field '%s' is invalid", input, parentField))
@@ -114,4 +142,30 @@ func (self BaseNode) CheckConstraints(field string, value interface{}) []string 
     }
 
     return _errors
+}
+
+func (self *BaseNode) SetDefaultValue(defaultValue interface{}) {
+    self.required = false // @todo see if its ok
+
+    self.defaultValue = defaultValue
+}
+
+func (self *BaseNode) AddConstraints(constraints []interfaces.ConstraintInterface) {
+    self.constraints = append(self.constraints, constraints...)
+}
+
+func (self *BaseNode) SetAllowNull(allowNull bool) {
+    self.allowNull = allowNull
+}
+
+func (self BaseNode) HasDefaultValue() bool {
+    return self.GetDefaultValue() != nil
+}
+
+func (self *BaseNode) GetDefaultValue() interface{} {
+    return self.defaultValue
+}
+
+func (self *BaseNode) AllowNull() bool {
+    return self.allowNull
 }

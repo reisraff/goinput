@@ -6,9 +6,19 @@ type NodeInterface interface {
     Walk(interface{}, string) interface{}
     HasChildren() bool
     SetTypeHandler(TypeHandlerInterface)
-    // AllowNull() bool
     CheckConstraints(field string, value interface{}) []string
     AddConstraint(ConstraintInterface)
     IsRequired() bool
-    SetRequired(val bool)
+
+
+    SetRequired(bool)
+    SetDefaultValue(interface{})
+    // SetInstantiator()
+    // SetTransformer()
+    AddConstraints([]ConstraintInterface)
+    SetAllowNull(bool)
+
+    HasDefaultValue() bool
+    GetDefaultValue() interface{}
+    AllowNull() bool
 }

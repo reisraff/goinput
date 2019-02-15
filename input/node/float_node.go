@@ -5,6 +5,7 @@ import "github.com/reisraff/goinput/input/constraints"
 
 func CreateFloatNode() interfaces.NodeInterface {
     node := FloatNode{}
+    node.SetRequired(true)
     node.AddConstraint(constraints.ConstraintType("float"))
 
     return &node
