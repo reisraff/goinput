@@ -1,7 +1,7 @@
 package input
 
 import "strings"
-import "github.com/reisraff/goinput/input/node"
+import "github.com/reisraff/goinput/input/nodes"
 import "github.com/reisraff/goinput/input/interfaces"
 
 type InputResult struct {
@@ -52,7 +52,7 @@ func (self * InputHandler) Configure(typeHandler interfaces.TypeHandlerInterface
 }
 
 func (self * InputHandler) Bind(input map[string]interface{}, definer Define) InputResult {
-    rootNode := node.CreateBaseNode()
+    rootNode := nodes.CreateBaseNode()
     rootNode.SetTypeHandler(self.typeHandler)
 
     result := InputResult{}
