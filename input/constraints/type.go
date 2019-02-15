@@ -1,6 +1,5 @@
 package constraints
 
-import "fmt"
 import "reflect"
 
 type Type struct {
@@ -30,40 +29,55 @@ func (self Type) GetErrorMessage() string {
 
 func (self Type) Validate(value interface{}) bool {
 
-    fmt.Printf("VALIDATE: %T %v", value, value)
-
     if value == nil {
         return false
     }
 
     reflectType := reflect.TypeOf(value).String()
 
-    if (self._type == "numeric") {
-        numeric_types := []string{
-            "int8",
-            "uint8",
-            "byte",
-            "int16",
-            "uint16",
-            "int32",
-            "rune",
-            "uint32",
-            "int64",
-            "uint64",
-            "int",
-            "uint",
-            "uintptr",
-            "float32",
-            "float64",
-            "complex64",
-            "complex128",
-        }
+    int_types := []string{
+        "int8",
+        "uint8",
+        "byte",
+        "int16",
+        "uint16",
+        "int32",
+        "rune",
+        "uint32",
+        "int64",
+        "uint64",
+        "int",
+        "uint",
+        "uintptr",
+    }
 
-        for _, v := range numeric_types {
-            if v == reflectType {
-                return true
+    float_types := []string{
+        "float32",
+        "float64",
+        "complex64",
+        "complex128",
+    }
+
+    switch self._type {
+        case "int":
+            for _, v := range int_types {
+                if v == reflectType {
+                    return true
+                }
             }
-        }
+        case "float":
+            for _, v := range float_types {
+                if v == reflectType {
+                    return true
+                }
+            }
+        case "numeric":
+            numeric_types := append(int_types, float_types...)
+            for _, v := range numeric_types {
+                if v == reflectType {
+                    return true
+                }
+            }
     }
 
     return reflectType == self._type

@@ -15,9 +15,9 @@ func DefaultTypeHandlerFactory() interfaces.TypeHandlerInterface {
     handler.types = map[string]node.NodeFactory{
         "object": node.CreateBaseNode,
         "bool": node.CreateBoolNode,
+        "string": node.CreateStringNode,
         "int": node.CreateIntNode,
         "float": node.CreateFloatNode,
-        "string": node.CreateStringNode,
         "numeric": node.CreateNumericNode,
         // "double": node.CreateFloatNode,
         // "object": node.CreateObjectNode,
