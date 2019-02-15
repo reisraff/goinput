@@ -7,4 +7,6 @@ type NodeInterface interface {
     HasChildren() bool
     SetTypeHandler(TypeHandlerInterface)
     // AllowNull() bool
+    CheckConstraints(field string, value interface{}) []string
+    AddConstraint(ConstraintInterface)
 }

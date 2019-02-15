@@ -1,5 +1,6 @@
 package input
 
+import "strings"
 import "github.com/reisraff/go-input/input/node"
 import "github.com/reisraff/go-input/input/interfaces"
 
@@ -9,26 +10,30 @@ type InputResult struct {
     errors []string
 }
 
-func (i * InputResult) Configure(root interfaces.NodeInterface) {
-    i.root = root
+func (self * InputResult) Configure(root interfaces.NodeInterface) {
+    self.root = root
 }
 
-func (i * InputResult) Add(key string, _type string, options map[string]interface{}) interfaces.NodeInterface {
-    node, err := i.root.Add(key, _type, options)
+func (self * InputResult) Add(key string, _type string, options map[string]interface{}) interfaces.NodeInterface {
+    node, err := self.root.Add(key, _type, options)
 
     if err != nil {
-        i.errors = append(i.errors, err.Error())
+        self.errors = append(self.errors, err.Error())
     }
 
     return node
 }
 
-func (i * InputResult) GetData(index string) interface{} {
-    return i.output.(map[string]interface{})[index]
+func (self * InputResult) GetData(index string) interface{} {
+    return self.output.(map[string]interface{})[index]
 }
 
-func (i * InputResult) IsValid() bool {
-    return len(i.errors) > 0
+func (self * InputResult) IsValid() bool {
+    return len(self.errors) == 0
+}
+
+func (self * InputResult) GetErrorsAsString() string {
+    return strings.Join(self.errors, ", ")
 }
 
 type Define func(InputResult)
@@ -42,13 +47,13 @@ type InputHandler struct {
     typeHandler interfaces.TypeHandlerInterface
 }
 
-func (i * InputHandler) Configure(typeHandler interfaces.TypeHandlerInterface) {
-    i.typeHandler = typeHandler
+func (self * InputHandler) Configure(typeHandler interfaces.TypeHandlerInterface) {
+    self.typeHandler = typeHandler
 }
 
-func (i * InputHandler) Bind(input map[string]interface{}, definer Define) InputResult {
+func (self * InputHandler) Bind(input map[string]interface{}, definer Define) InputResult {
     rootNode := node.CreateBaseNode()
-    rootNode.SetTypeHandler(i.typeHandler)
+    rootNode.SetTypeHandler(self.typeHandler)
 
     result := InputResult{}
     result.Configure(rootNode)
@@ -56,6 +61,7 @@ func (i * InputHandler) Bind(input map[string]interface{}, definer Define) Input
     definer(result)
 
     result.output = result.root.GetValue("root", result.root.Walk(input))
+    result.errors = self.typeHandler.GetErrors()
 
     return result
 }
