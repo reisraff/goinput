@@ -4,17 +4,28 @@
 import "github.com/reisraff/goinput/input"
 
 func NotificationCreateDefine(self input.InputResult) {
-    object := self.Add("object", "object", nil)
+    object := self.Add("field_object", "object", nil)
 
-    object.Add("numeric", "numeric", nil)
-    object.Add("string", "string", nil)
-    object.Add("bool", "bool", nil)
+    object.Add("field_string", "string", nil)
+    object.Add(
+        "field_numeric",
+        "numeric",
+        map[string]interface{}{
+            "required": false,
+        },
+    )
+    object.Add(
+        "field_bool",
+        "bool",
+        map[string]interface{}{
+            "default_value": false,
+        },
+    )
 }
 
 func (c NotificationController) Create() revel.Result {
     handler := input.InputHandler{}
     handler.Configure(input.DefaultTypeHandlerFactory())
-
 
     data := make(map[string]interface{})
     c.Params.BindJSON(&data)
