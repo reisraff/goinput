@@ -1,7 +1,7 @@
 package input
 
-import "github.com/reisraff/input/input/node"
-import "github.com/reisraff/input/input/interfaces"
+import "github.com/reisraff/go-input/input/node"
+import "github.com/reisraff/go-input/input/interfaces"
 
 type InputResult struct {
     root interfaces.NodeInterface

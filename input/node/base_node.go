@@ -1,7 +1,7 @@
 package node
 
 // import "fmt"
-import "github.com/reisraff/input/input/interfaces"
+import "github.com/reisraff/go-input/input/interfaces"
 
 type NodeFactory func() interfaces.NodeInterface
 

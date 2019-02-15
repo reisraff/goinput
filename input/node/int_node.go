@@ -1,6 +1,6 @@
 package node
 
-import "github.com/reisraff/input/input/interfaces"
+import "github.com/reisraff/go-input/input/interfaces"
 
 func CreateIntNode() interfaces.NodeInterface {
     return &IntNode{}
