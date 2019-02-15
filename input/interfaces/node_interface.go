@@ -14,7 +14,7 @@ type NodeInterface interface {
     SetRequired(bool)
     SetDefaultValue(interface{})
     // SetInstantiator()
-    // SetTransformer()
+    SetTransformer(TransformerInterface)
     AddConstraints([]ConstraintInterface)
     SetAllowNull(bool)
 

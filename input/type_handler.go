@@ -1,27 +1,27 @@
 package input
 
 import "errors"
-import "github.com/reisraff/goinput/input/node"
+import "github.com/reisraff/goinput/input/nodes"
 import "github.com/reisraff/goinput/input/interfaces"
 
 
 type DefaultTypeHandler struct {
-    types map[string]node.NodeFactory
+    types map[string]nodes.NodeFactory
     _errors []string
 }
 
 func DefaultTypeHandlerFactory() interfaces.TypeHandlerInterface {
     handler := DefaultTypeHandler{}
-    handler.types = map[string]node.NodeFactory{
-        "object": node.CreateBaseNode,
-        "bool": node.CreateBoolNode,
-        "string": node.CreateStringNode,
-        "int": node.CreateIntNode,
-        "float": node.CreateFloatNode,
-        "numeric": node.CreateNumericNode,
-        // "double": node.CreateFloatNode,
-        // "object": node.CreateObjectNode,
-        // "datetime": node.CreateDateTimeNode,
+    handler.types = map[string]nodes.NodeFactory{
+        "object": nodes.CreateBaseNode,
+        "bool": nodes.CreateBoolNode,
+        "string": nodes.CreateStringNode,
+        "int": nodes.CreateIntNode,
+        "float": nodes.CreateFloatNode,
+        "numeric": nodes.CreateNumericNode,
+        // "double": nodes.CreateFloatNode,
+        // "object": nodes.CreateObjectNode,
+        // "datetime": nodes.CreateDateTimeNode,
     }
 
     return &handler
