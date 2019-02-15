@@ -19,9 +19,9 @@ func DefaultTypeHandlerFactory() interfaces.TypeHandlerInterface {
         "int": nodes.CreateIntNode,
         "float": nodes.CreateFloatNode,
         "numeric": nodes.CreateNumericNode,
+        "datetime": nodes.CreateDateTimeNode,
         // "double": nodes.CreateFloatNode,
         // "object": nodes.CreateObjectNode,
-        // "datetime": nodes.CreateDateTimeNode,
     }
 
     return &handler
