@@ -61,6 +61,10 @@ func (self * BaseNode) GetValue(field string, value interface{}) interface{} {
 }
 
 func (self BaseNode) Walk(input interface{}, parentField string) interface{} {
+    if input == nil {
+        return input
+    }
+
     result := make(map[string]interface{})
 
     if (! self.HasChildren()) {
