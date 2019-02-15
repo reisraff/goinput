@@ -1,17 +1,31 @@
 package node
 
+import "fmt"
+import "reflect"
 import "github.com/reisraff/go-input/input/interfaces"
 
 type NodeFactory func() interfaces.NodeInterface
 
 func CreateBaseNode() interfaces.NodeInterface {
-    return &BaseNode{}
+    node := BaseNode{}
+    node.SetRequired(true)
+
+    return &node
 }
 
 type BaseNode struct {
     typeHandler interfaces.TypeHandlerInterface
     children map[string]interfaces.NodeInterface
     constraints []interfaces.ConstraintInterface
+    required bool
+}
+
+func (self * BaseNode) SetRequired(required bool) {
+    self.required = required
+}
+
+func (self BaseNode) IsRequired() bool {
+    return self.required
 }
 
 func (self * BaseNode) SetTypeHandler(typeHandler interfaces.TypeHandlerInterface) {
@@ -46,7 +60,7 @@ func (self * BaseNode) GetValue(field string, value interface{}) interface{} {
     return value
 }
 
-func (self BaseNode) Walk(input interface{}) interface{} {
+func (self BaseNode) Walk(input interface{}, parentField string) interface{} {
     result := make(map[string]interface{})
 
     if (! self.HasChildren()) {
@@ -54,19 +68,25 @@ func (self BaseNode) Walk(input interface{}) interface{} {
     }
 
     for field, node := range self.children {
-        // if value, ok := input.(map[string]interface{})[field]; ok {
-        //     if (node.isRequired()) {
-        //         throw new RequiredFieldException(field)
-        //     }
+        if "map[string]interface {}" == reflect.TypeOf(input).String() {
+            if _, ok := input.(map[string]interface{})[field]; !ok {
+                if node.IsRequired() {
+                    self.typeHandler.AddError(fmt.Sprintf("field '%s' is required", field))
+                }
 
-        //     if ! node.hasDefault() {
-        //         continue
-        //     }
+                // if ! node.hasDefault() {
+                //     continue
+                // }
 
-        //     value = node.getDefault()
-        // }
+                // input.(map[string]interface{})[field] = node.getDefault()
+            }
 
-        result[field] = node.GetValue(field, node.Walk(input.(map[string]interface{})[field]))
+            fmt.Printf("input[%s] = %v\n", field, input.(map[string]interface{})[field])
+            result[field] = node.GetValue(field, node.Walk(input.(map[string]interface{})[field], field))
+        } else {
+            self.typeHandler.AddError(fmt.Sprintf("value %v for field '%s' is invalid", input, parentField))
+            break
+        }
     }
 
     return result

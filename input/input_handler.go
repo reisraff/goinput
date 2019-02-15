@@ -60,7 +60,7 @@ func (self * InputHandler) Bind(input map[string]interface{}, definer Define) In
 
     definer(result)
 
-    result.output = result.root.GetValue("root", result.root.Walk(input))
+    result.output = result.root.GetValue("root", result.root.Walk(input, "root"))
     result.errors = self.typeHandler.GetErrors()
 
     return result
