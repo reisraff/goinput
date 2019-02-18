@@ -3,23 +3,29 @@
 ```go
 import "github.com/reisraff/goinput/input"
 
-func NotificationCreateDefine(self input.InputResult) {
-    object := self.Add("field_object", "object", nil)
+type Notification struct {
+    Text string
+    Url string
+}
 
-    object.Add("field_string", "string", nil)
+func (self *Notification) SetText(text string) {
+    self.Text = text
+}
+
+func (self *Notification) SetUrl(url string) {
+    self.Url = url
+}
+
+func NotificationCreateDefine(self input.InputResult) {
+    object := self.Add("notification", Notification{}, nil)
+
+    object.Add("text", "string", nil)
     object.Add(
-        "field_numeric",
-        "numeric",
+        "url",
+        "string",
         map[string]interface{}{
             "required": false,
-        },
-    )
-    object.Add(
-        "field_bool",
-        "bool",
-        map[string]interface{}{
-            "default_value": false,
-        },
+        }
     )
 }
 
@@ -39,8 +45,10 @@ func (c NotificationController) Create() revel.Result {
         return c.RenderJSON(data)
     }
 
+    notification := result.GetData("notification").(*Notification)
+
     data = make(map[string]interface{})
-    data["data"] = result.GetData("object")
+    data["data"] = notification
 
     return c.RenderJSON(data)
 }
