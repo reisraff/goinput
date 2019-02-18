@@ -2,6 +2,7 @@
 
 ```go
 import "github.com/reisraff/goinput/input"
+import "github.com/revel/revel"
 
 type Notification struct {
     Text string

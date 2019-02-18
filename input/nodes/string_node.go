@@ -6,6 +6,7 @@ import "github.com/reisraff/goinput/input/constraints"
 func CreateStringNode() interfaces.NodeInterface {
     node := StringNode{}
     node.SetRequired(true)
+    node.SetType("string")
     node.AddConstraint(constraints.ConstraintType("string"))
 
     return &node
