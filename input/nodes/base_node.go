@@ -9,6 +9,7 @@ type NodeFactory func() interfaces.NodeInterface
 func CreateBaseNode() interfaces.NodeInterface {
     node := BaseNode{}
     node.SetRequired(true)
+    node.SetType("object")
 
     return &node
 }
@@ -21,6 +22,24 @@ type BaseNode struct {
     defaultValue interface{}
     allowNull bool
     transformer interfaces.TransformerInterface
+    _type interface{}
+    instantiator interfaces.InstantiatorInterface
+}
+
+func (self *BaseNode) SetInstantiator(instantiator interfaces.InstantiatorInterface) {
+    self.instantiator = instantiator
+}
+
+func (self BaseNode) GetInstantiator() interfaces.InstantiatorInterface {
+    return self.instantiator
+}
+
+func (self *BaseNode) SetType(_type interface{}) {
+    self._type = _type
+}
+
+func (self BaseNode) GetType() interface{} {
+    return self._type
 }
 
 func (self *BaseNode) SetRequired(required bool) {
@@ -35,7 +54,7 @@ func (self *BaseNode) SetTypeHandler(typeHandler interfaces.TypeHandlerInterface
     self.typeHandler = typeHandler
 }
 
-func (self *BaseNode) Add(key string, _type string, options map[string]interface{}) (interfaces.NodeInterface, error) {
+func (self *BaseNode) Add(key string, _type interface{}, options map[string]interface{}) (interfaces.NodeInterface, error) {
     child, err := self.typeHandler.GetType(_type)
 
     if options == nil {

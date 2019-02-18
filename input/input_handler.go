@@ -3,6 +3,7 @@ package input
 import "strings"
 import "github.com/reisraff/goinput/input/nodes"
 import "github.com/reisraff/goinput/input/interfaces"
+import "reflect"
 
 type InputResult struct {
     root interfaces.NodeInterface
@@ -14,7 +15,7 @@ func (self * InputResult) Configure(root interfaces.NodeInterface) {
     self.root = root
 }
 
-func (self * InputResult) Add(key string, _type string, options map[string]interface{}) interfaces.NodeInterface {
+func (self * InputResult) Add(key string, _type interface{}, options map[string]interface{}) interfaces.NodeInterface {
     node, err := self.root.Add(key, _type, options)
 
     if err != nil {
@@ -25,7 +26,14 @@ func (self * InputResult) Add(key string, _type string, options map[string]inter
 }
 
 func (self * InputResult) GetData(index string) interface{} {
-    return self.output.(map[string]interface{})[index]
+    var result interface{}
+    result = self.output.(map[string]interface{})[index]
+
+    if reflect.TypeOf(result).String() == "reflect.Value" {
+        result = result.(reflect.Value).Interface()
+    }
+
+    return result
 }
 
 func (self * InputResult) IsValid() bool {

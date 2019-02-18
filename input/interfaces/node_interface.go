@@ -1,7 +1,7 @@
 package interfaces
 
 type NodeInterface interface {
-    Add(string, string, map[string]interface{}) (NodeInterface, error)
+    Add(string, interface{}, map[string]interface{}) (NodeInterface, error)
     GetValue(string, interface{}) interface{}
     Walk(interface{}, string) interface{}
     HasChildren() bool
@@ -13,7 +13,8 @@ type NodeInterface interface {
 
     SetRequired(bool)
     SetDefaultValue(interface{})
-    // SetInstantiator()
+    SetInstantiator(InstantiatorInterface)
+    GetInstantiator() InstantiatorInterface
     SetTransformer(TransformerInterface)
     AddConstraints([]ConstraintInterface)
     SetAllowNull(bool)
@@ -21,4 +22,7 @@ type NodeInterface interface {
     HasDefaultValue() bool
     GetDefaultValue() interface{}
     AllowNull() bool
+
+    GetType() interface{}
+    SetType(interface{})
 }
