@@ -59,9 +59,10 @@ func (self * InputHandler) Configure(typeHandler interfaces.TypeHandlerInterface
     self.typeHandler = typeHandler
 }
 
-func (self * InputHandler) Bind(input map[string]interface{}, definer Define) InputResult {
+func (self * InputHandler) Bind(input map[string]interface{}, definer Define, defaults map[string]interface{}) InputResult {
     rootNode := nodes.CreateBaseNode()
     rootNode.SetTypeHandler(self.typeHandler)
+    rootNode.SetDefaults(defaults)
 
     result := InputResult{}
     result.Configure(rootNode)

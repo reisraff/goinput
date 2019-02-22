@@ -25,4 +25,6 @@ type NodeInterface interface {
 
     GetType() interface{}
     SetType(interface{})
+
+    SetDefaults(map[string]interface{})
 }

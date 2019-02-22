@@ -24,6 +24,7 @@ type BaseNode struct {
     transformer interfaces.TransformerInterface
     _type interface{}
     instantiator interfaces.InstantiatorInterface
+    defaults map[string]interface{}
 }
 
 func (self *BaseNode) SetInstantiator(instantiator interfaces.InstantiatorInterface) {
@@ -36,6 +37,10 @@ func (self BaseNode) GetInstantiator() interfaces.InstantiatorInterface {
 
 func (self *BaseNode) SetType(_type interface{}) {
     self._type = _type
+}
+
+func (self *BaseNode) SetDefaults(defaults map[string]interface{}) {
+    self.defaults = defaults
 }
 
 func (self BaseNode) GetType() interface{} {
@@ -69,9 +74,9 @@ func (self *BaseNode) Add(key string, _type interface{}, options map[string]inte
         child.SetDefaultValue(value)
     }
 
-    // if value, ok := options["instantiator"]; ok {
-    //     child.SetInstantiator(value)
-    // }
+    if value, ok := options["instantiator"]; ok {
+        child.SetInstantiator(value.(interfaces.InstantiatorInterface))
+    }
 
     if value, ok := options["transformer"]; ok {
         child.SetTransformer(value.(interfaces.TransformerInterface))
@@ -83,6 +88,12 @@ func (self *BaseNode) Add(key string, _type interface{}, options map[string]inte
 
     if value, ok := options["allow_null"]; ok {
         child.SetAllowNull(value.(bool))
+    }
+
+    if self.defaults != nil {
+        if value, ok := self.defaults[key]; ok {
+            child.SetDefaultValue(value)
+        }
     }
 
     if self.children == nil {
