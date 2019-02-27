@@ -5,6 +5,7 @@ import "github.com/reisraff/goinput/input/nodes"
 import "github.com/reisraff/goinput/input/interfaces"
 import "github.com/reisraff/goinput/input/instantiators"
 import "reflect"
+import "fmt"
 
 type DefaultTypeHandler struct {
     types map[string]nodes.NodeFactory
@@ -15,7 +16,7 @@ type DefaultTypeHandler struct {
 func DefaultTypeHandlerFactory() interfaces.TypeHandlerInterface {
     handler := DefaultTypeHandler{}
     handler.types = map[string]nodes.NodeFactory{
-        "object": nodes.CreateBaseNode,
+        "mixed": nodes.CreateBaseNode,
         "bool": nodes.CreateBoolNode,
         "string": nodes.CreateStringNode,
         "int": nodes.CreateIntNode,
@@ -39,28 +40,47 @@ func (self *DefaultTypeHandler) GetDefaultInstantiator() interfaces.Instantiator
     return self.defaultInstantiator
 }
 
-func (self *DefaultTypeHandler) GetType(_type interface{}) (interfaces.NodeInterface, error) {
+func (self *DefaultTypeHandler) GetType(_type interface{}, isCollection bool) (interfaces.NodeInterface, error) {
     typeString := reflect.TypeOf(_type).Kind().String()
 
     switch typeString {
         case "string" :
             if val, ok := self.types[_type.(string)]; ok {
                 result := val()
-                result.SetType(_type.(string));
+                result.SetType(_type.(string))
                 result.SetTypeHandler(self)
 
                 return result, nil;
+            } else {
+                result := nodes.CreateDummyNode()
+                result.SetTypeHandler(self)
+
+                return result, errors.New("Type " + _type.(string) + " does not exists.")
             }
         case "struct":
-            result := nodes.CreateStructNode();
-            result.SetType(_type);
-            result.SetTypeHandler(self);
-            result.SetInstantiator(self.GetDefaultInstantiator());
+            if isCollection {
+                result := nodes.CreateSliceNode()
+                result.SetType(_type)
+                result.SetTypeHandler(self)
+                result.SetInstantiator(self.GetDefaultInstantiator())
 
-            return result, nil;
+                return result, nil;
+            } else {
+                result := nodes.CreateStructNode()
+                result.SetType(_type)
+                result.SetTypeHandler(self)
+                result.SetInstantiator(self.GetDefaultInstantiator())
+
+                return result, nil;
+            }
+        default:
+            result := nodes.CreateDummyNode()
+            result.SetTypeHandler(self)
+
+            return result, errors.New("Type " + typeString + " does not exists.")
     }
 
-    return nil, errors.New("Type " + typeString + " does not exists.")
+    return nil, errors.New(fmt.Sprintf("Unexpected error. Inputed type: %T", _type))
 }
 
 func (self *DefaultTypeHandler) AddError(err string) {

@@ -22,5 +22,5 @@ func (self SetInstantiator) Instantiate(_type interface{}, value interface{}) in
         }
     }
 
-    return result
+    return result.Interface()
 }

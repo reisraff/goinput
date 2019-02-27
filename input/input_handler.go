@@ -16,11 +16,13 @@ func (self * InputResult) Configure(root interfaces.NodeInterface) {
 }
 
 func (self * InputResult) Add(key string, _type interface{}, options map[string]interface{}) interfaces.NodeInterface {
-    node, err := self.root.Add(key, _type, options)
+    node := self.root.Add(key, _type, options)
 
-    if err != nil {
-        self.errors = append(self.errors, err.Error())
-    }
+    return node
+}
+
+func (self * InputResult) AddCollection(key string, _type interface{}, options map[string]interface{}) interfaces.NodeInterface {
+    node := self.root.AddCollection(key, _type, options)
 
     return node
 }

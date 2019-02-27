@@ -1,7 +1,8 @@
 package interfaces
 
 type NodeInterface interface {
-    Add(string, interface{}, map[string]interface{}) (NodeInterface, error)
+    Add(string, interface{}, map[string]interface{}) NodeInterface
+    AddCollection(string, interface{}, map[string]interface{}) NodeInterface
     GetValue(string, interface{}) interface{}
     Walk(interface{}, string) interface{}
     HasChildren() bool

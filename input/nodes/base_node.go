@@ -59,40 +59,44 @@ func (self *BaseNode) SetTypeHandler(typeHandler interfaces.TypeHandlerInterface
     self.typeHandler = typeHandler
 }
 
-func (self *BaseNode) Add(key string, _type interface{}, options map[string]interface{}) (interfaces.NodeInterface, error) {
-    child, err := self.typeHandler.GetType(_type)
+func (self *BaseNode) SpecialAdd(key string, _type interface{}, options map[string]interface{}, isCollection bool) interfaces.NodeInterface {
+    child, err := self.typeHandler.GetType(_type, isCollection)
 
-    if options == nil {
-        options = make(map[string]interface{})
-    }
+    if err != nil {
+        self.typeHandler.AddError(err.Error())
+    } else {
+        if options == nil {
+            options = make(map[string]interface{})
+        }
 
-    if value, ok := options["required"]; ok {
-        child.SetRequired(value.(bool))
-    }
+        if value, ok := options["required"]; ok {
+            child.SetRequired(value.(bool))
+        }
 
-    if value, ok := options["default_value"]; ok {
-        child.SetDefaultValue(value)
-    }
-
-    if value, ok := options["instantiator"]; ok {
-        child.SetInstantiator(value.(interfaces.InstantiatorInterface))
-    }
-
-    if value, ok := options["transformer"]; ok {
-        child.SetTransformer(value.(interfaces.TransformerInterface))
-    }
-
-    if value, ok := options["constraints"]; ok {
-        child.AddConstraints(value.([]interfaces.ConstraintInterface))
-    }
-
-    if value, ok := options["allow_null"]; ok {
-        child.SetAllowNull(value.(bool))
-    }
-
-    if self.defaults != nil {
-        if value, ok := self.defaults[key]; ok {
+        if value, ok := options["default_value"]; ok {
             child.SetDefaultValue(value)
+        }
+
+        if value, ok := options["instantiator"]; ok {
+            child.SetInstantiator(value.(interfaces.InstantiatorInterface))
+        }
+
+        if value, ok := options["transformer"]; ok {
+            child.SetTransformer(value.(interfaces.TransformerInterface))
+        }
+
+        if value, ok := options["constraints"]; ok {
+            child.AddConstraints(value.([]interfaces.ConstraintInterface))
+        }
+
+        if value, ok := options["allow_null"]; ok {
+            child.SetAllowNull(value.(bool))
+        }
+
+        if self.defaults != nil {
+            if value, ok := self.defaults[key]; ok {
+                child.SetDefaultValue(value)
+            }
         }
     }
 
@@ -101,7 +105,15 @@ func (self *BaseNode) Add(key string, _type interface{}, options map[string]inte
     }
     self.children[key] = child
 
-    return child, err
+    return child
+}
+
+func (self *BaseNode) Add(key string, _type interface{}, options map[string]interface{}) interfaces.NodeInterface {
+    return self.SpecialAdd(key, _type, options, false)
+}
+
+func (self *BaseNode) AddCollection(key string, _type interface{}, options map[string]interface{}) interfaces.NodeInterface {
+    return self.SpecialAdd(key, _type, options, true)
 }
 
 func (self *BaseNode) GetValue(field string, value interface{}) interface{} {
@@ -147,7 +159,7 @@ func (self BaseNode) Walk(input interface{}, parentField string) interface{} {
 
             result[field] = node.GetValue(field, node.Walk(input.(map[string]interface{})[field], field))
         } else {
-            self.typeHandler.AddError(fmt.Sprintf("value %v for field '%s' is invalid", input, parentField))
+            self.typeHandler.AddError(fmt.Sprintf("value '%v' for field '%s' is invalid", input, parentField))
             break
         }
     }

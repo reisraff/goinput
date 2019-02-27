@@ -1,7 +1,7 @@
 package interfaces
 
 type TypeHandlerInterface interface {
-    GetType(interface{}) (NodeInterface, error)
+    GetType(interface{}, bool) (NodeInterface, error)
     AddError(string)
     GetErrors() []string
     SetDefaultInstantiator(InstantiatorInterface)
